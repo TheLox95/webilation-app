@@ -14,7 +14,17 @@
                         </div>
                     @endif
 
-                    You are logged in!
+                    {{ Debugbar::info(session('social_user'))}}
+
+                    @if (session('social_user')->user['provider'] == 'facebook')
+                        @include('facebook')
+                    @endif
+
+                    @if (session('social_user')->user['provider'] == 'twitter')
+                        @include('twitter')
+                    @endif
+
+                    
                 </div>
             </div>
         </div>
