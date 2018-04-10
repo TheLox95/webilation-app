@@ -8,22 +8,22 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class FacebookDriver{
     protected $user;
+    protected $fields = [
+        'name', 'first_name', 'last_name', 'email', 'gender', 'birthday', 'likes', 'friends', 'posts.order(reverse_chronological )'
+    ];
+    protected $scopes = [
+        'user_birthday', 'user_hometown', 'user_location', 'user_likes', 'user_friends', 'user_posts', 'email', 'public_profile'
+    ];
 
     public function providerRedirect(){
         return Socialite::driver('facebook')
-        ->fields([
-            'name', 'first_name', 'last_name', 'email', 'gender', 'birthday', 'likes'
-        ])
-        ->scopes([
-            'email', 'user_likes', 'user_birthday'
-        ])->redirect();
+        ->fields($this->fields)
+        ->scopes($this->scopes)->redirect();
     }
 
     public function providerUser(){
        $this->user = Socialite::driver('facebook')
-        ->fields([
-            'name','first_name', 'last_name', 'email', 'gender', 'birthday', 'likes'
-        ])->user();
+        ->fields($this->fields)->user();
         return $this->user;
     }
 
