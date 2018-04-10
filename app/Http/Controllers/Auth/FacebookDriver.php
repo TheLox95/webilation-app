@@ -12,7 +12,7 @@ class FacebookDriver{
     public function providerRedirect(){
         return Socialite::driver('facebook')
         ->fields([
-            'first_name', 'last_name', 'email', 'gender', 'birthday', 'likes'
+            'name', 'first_name', 'last_name', 'email', 'gender', 'birthday', 'likes'
         ])
         ->scopes([
             'email', 'user_likes', 'user_birthday'
@@ -22,24 +22,12 @@ class FacebookDriver{
     public function providerUser(){
        $this->user = Socialite::driver('facebook')
         ->fields([
-            'first_name', 'last_name', 'email', 'gender', 'birthday', 'likes'
+            'name','first_name', 'last_name', 'email', 'gender', 'birthday', 'likes'
         ])->user();
         return $this->user;
     }
 
     public function provideData(){
-        $items = [
-            'item1',
-            'item2',
-            'item3',
-            'item4',
-            'item5',
-            'item6',
-            'item7',
-            'item8',
-            'item9',
-            'item10'
-            ];
  
         // Get current page form url e.x. &page=1
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
