@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 
+
 use Socialite;
 use Auth;
 use App\User;
@@ -13,10 +14,17 @@ use App\User;
 class SocialAccountController extends Controller
 {
     protected $redirectTo = '/home';
+    protected $socialDrivers = array();
+
+    public function __construct(){
+        $this->socialDrivers['facebook'] = new FacebookDriver();
+        $this->socialDrivers['twitter'] = new TwitterDriver();
+    }
+
 
     public function redirectToProvider($provider)
     {
-        return Socialite::driver($provider)->redirect();
+        return $this->socialDrivers[$provider]->providerRedirect();
     }
 
     /**
@@ -30,13 +38,22 @@ class SocialAccountController extends Controller
     public function handleProviderCallback($provider)
     {
         try {
-            $user = Socialite::driver($provider)->user();
+            $driver = $this->socialDrivers[$provider];
+            $user = $driver->providerUser();
 
             $authUser = $this->findOrCreateUser($user, $provider);
-            Auth::login($authUser, true);      
-            return redirect($this->redirectTo);
+            Auth::login($authUser, true);   
+            $user['provider'] = $provider;
+            Session()->put('social_user', $user);
+
+            $driver->provideData();
+                   
+
+            return redirect('/home');
+            //return redirect($this->redirectTo);
         }
-        catch (\Exception $e) {      
+        catch (\Exception $e) {  
+            Session()->flash('message', $e->getMessage());    
             return redirect('/');
         }
     }
