@@ -12,6 +12,7 @@
         "laravel/framework": "5.6.*",
         "laravel/socialite": "^3.0",
         "laravel/tinker": "^1.0",
+        "khill/lavacharts" : "3.0.*",
         "barryvdh/laravel-debugbar": "^3.1"        
     },
     "require-dev": {
