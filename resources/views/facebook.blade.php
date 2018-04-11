@@ -19,7 +19,7 @@
                                     <h6>Friends ammo {{ session('social_user')->user['friends']['summary']['total_count']}}</h6>
                                 </div>
                             </div>
-                    </div>
+                    </div>                    
                     <ul class="nav nav-tabs" id="myTab" role="tablist">
                         <li class="nav-item">
                             <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Likes</a>
@@ -30,8 +30,12 @@
                     </ul>
                         <div class="tab-content" id="myTabContent">
                         <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                        <h1>Liked pages</h1>
-                    
+                    <h1>Liked pages</h1>
+                        <div class="row">
+                            <div class="col">
+                                Liked pages {{ count(session('social_user')->user['likes']['data']) }}
+                            </div>
+                        </div>
 
                     <table class="table">
                         <thead>
@@ -41,7 +45,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                        @foreach(session('social_user')->user['likes']['data'] as $like)
+                        @foreach(session('pagination') as $like)
                             <tr>
                                 <td>{{$like['name']}}</td>
                                 <td>{{ date('d-m-Y', strtotime($like['created_time'])) }}</td>
@@ -49,6 +53,8 @@
                         @endforeach
                         </tbody>
                     </table>
+                    {{-- Render the pagination links... --}}
+                    {!! session('pagination')->render() !!}
                         </div>
                         <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                         <table class="table">
