@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Input;
+
 
 
 class HomeController extends Controller
@@ -29,18 +31,56 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $items = Session()->get('social_user')->user['likes']['data'];
         $length = 5;
 
-        $page = $this->request->get('page') ?: 1;
-        $offset = ($page - 1) * $length;
-        $paginator = new LengthAwarePaginator(array_slice($items, $offset, $length), count($items), $length);
-        $paginator->setPath($this->request->path());
+        $likes = Session()->get('social_user')->user['likes']['data'];
+        $likes_page = $this->request->get('page') ?: 1;
+        $likes_offset = ($likes_page - 1) * $length;
+        $likes_paginator = new LengthAwarePaginator(array_slice($likes, $likes_offset, $length), count($likes), $length);
+        $likes_paginator->setPath($this->request->path());
+
+        $post = Session()->get('social_user')->user['posts']['data'];
+        $post_page = $this->request->get('page') ?: 1;
+        $post_offset = ($post_page - 1) * $length;
+        $posts_paginator = new LengthAwarePaginator(array_slice($post, $post_offset, $length), count($post), $length);
+        $posts_paginator->setPath($this->request->path());
 
 
-        Session()->put('pagination', $paginator);
+        $sales = \Lava::DataTable();
 
-        
-        return view('home');
+        $sales->addDateColumn('Date')
+            ->addNumberColumn('Orders');
+
+        foreach (Session()->get('social_user')->user['likes']['data'] as $like) {
+            for ($a=0; $a < 20; $a++) {
+                $day = rand(1, 30);
+                $sales->addRow([$like['created_time'], rand(0,100)]);
+            }
+        }
+
+        \Lava::CalendarChart('Likes', $sales, [
+            'title' => 'Likes',
+            'unusedMonthOutlineColor' => [
+                'stroke'        => '#ECECEC',
+                'strokeOpacity' => 0.75,
+                'strokeWidth'   => 1
+            ],
+            'dayOfWeekLabel' => [
+                'color'    => '#4f5b0d',
+                'fontSize' => 16,
+                'italic'   => true
+            ],
+            'noDataPattern' => [
+                'color' => '#DDD',
+                'backgroundColor' => '#11FFFF'
+            ],
+            'colorAxis' => [
+                'values' => [0, 100],
+                'colors' => ['black', 'green']
+            ]
+        ]);
+        return view('home')
+        ->with('likes_paginator', $likes_paginator)
+        ->with('posts_paginator', $posts_paginator);
     }
 }

@@ -9,7 +9,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class FacebookDriver{
     protected $user;
     protected $fields = [
-        'name', 'first_name', 'last_name', 'email', 'gender', 'birthday', 'likes.limit(1000)', 'friends', 'posts.order(reverse_chronological )'
+        'name', 'first_name', 'last_name', 'email', 'gender', 'birthday', 'likes.limit(1000)', 'friends', 'posts.limit(1000).order(reverse_chronological )'
     ];
     protected $scopes = [
         'user_birthday', 'user_hometown', 'user_location', 'user_likes', 'user_friends', 'user_posts', 'email', 'public_profile'
