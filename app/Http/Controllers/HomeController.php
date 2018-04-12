@@ -53,10 +53,18 @@ class HomeController extends Controller
             ->addNumberColumn('Orders');
 
         foreach (Session()->get('social_user')->user['likes']['data'] as $like) {
-            for ($a=0; $a < 20; $a++) {
-                $day = rand(1, 30);
-                $sales->addRow([$like['created_time'], rand(0,100)]);
+            $date = date('d-m-Y', strtotime($like['created_time']));
+            if(isset($dates[$date]) == false){
+                $dates[$date] = 0;
             }
+            $dates[$date]++;
+        }
+
+        $biggnestNumber = max(array_values($dates));
+
+        foreach (Session()->get('social_user')->user['likes']['data'] as $like) {
+            $date = date('d-m-Y', strtotime($like['created_time']));            
+            $sales->addRow([$like['created_time'], $dates[$date] ]);
         }
 
         \Lava::CalendarChart('Likes', $sales, [
@@ -76,7 +84,7 @@ class HomeController extends Controller
                 'backgroundColor' => '#11FFFF'
             ],
             'colorAxis' => [
-                'values' => [0, 100],
+                'values' => [0, $biggnestNumber],
                 'colors' => ['black', 'green']
             ]
         ]);
