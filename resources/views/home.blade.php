@@ -16,14 +16,15 @@
 
                     {{ Debugbar::info(session('social_user'))}}
 
-                    @if (session('social_user')->user['provider'] == 'facebook')
-                        @include('facebook')
-                    @endif
+                    @if (session('social_user'))
+                        @if (session('social_user')->user['provider'] == 'facebook')
+                            @include('facebook')
+                        @endif
 
-                    @if (session('social_user')->user['provider'] == 'twitter')
-                        @include('twitter')
+                        @if (session('social_user')->user['provider'] == 'twitter')
+                            @include('twitter')
+                        @endif
                     @endif
-
                     
                 </div>
             </div>

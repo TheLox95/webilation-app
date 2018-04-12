@@ -31,7 +31,8 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $length = 5;
+        if(Session()->get('social_user')){
+            $length = 5;
 
         $likes = Session()->get('social_user')->user['likes']['data'];
         $likes_page = $this->request->get('page') ?: 1;
@@ -82,5 +83,8 @@ class HomeController extends Controller
         return view('home')
         ->with('likes_paginator', $likes_paginator)
         ->with('posts_paginator', $posts_paginator);
+        }else {
+            return view('home');
+        }
     }
 }
