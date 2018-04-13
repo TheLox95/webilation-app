@@ -6,6 +6,7 @@ use Socialite;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Subscriber\Oauth\Oauth1;
+use Auth;
 
 
 class TwitterDriver{
@@ -20,14 +21,15 @@ class TwitterDriver{
         return $this->user;
     }
 
-    public function provideData(){
+    public function provideData($request){
         $stack = HandlerStack::create();
+        $user = Session()->get('social_user');
 
         $middleware = new Oauth1([
             'consumer_key'     => env('TWITTER_ID'),
             'consumer_secret' => env('TWITTER_SECRET'),
-            'token'           => $this->user->token,
-            'token_secret'    => $this->user->tokenSecret
+            'token'           => $user->token,
+            'token_secret'    => $user->tokenSecret
         ]);
 
         $stack->push($middleware);
@@ -39,19 +41,22 @@ class TwitterDriver{
         ]);
 
         $user_info = $client->get('users/show.json',['query' => [
-            'screen_name' => $this->user->nickname,
-            'user_id' => $this->user->id,
+            'screen_name' => $user->nickname,
+            'user_id' => $user->id,
         ]]);
 
         $res = json_decode($user_info->getBody());
 
         $tweets = $client->get('statuses/user_timeline.json',['query' => [
-            'screen_name' => $this->user->nickname,
+            'screen_name' => $user->nickname,
             'count' => '50',
         ]]);
 
         $res->tweets = json_decode($tweets->getBody());
 
         Session()->put('twitter_data', $res);
+
+        return view('home');
+        
     }
 }

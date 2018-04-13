@@ -21,7 +21,8 @@ class HomeController extends Controller
     {
         $this->middleware('auth');
         $this->request = $request;
-        
+        $this->socialDrivers['facebook'] = new \App\Http\Controllers\Auth\FacebookDriver();
+        $this->socialDrivers['twitter'] = new \App\Http\Controllers\Auth\TwitterDriver();        
     }
 
     /**
@@ -32,65 +33,7 @@ class HomeController extends Controller
     public function index()
     {
         if(Session()->get('social_user')){
-            $length = 5;
-
-        $likes = Session()->get('social_user')->user['likes']['data'];
-        $likes_page = $this->request->get('page') ?: 1;
-        $likes_offset = ($likes_page - 1) * $length;
-        $likes_paginator = new LengthAwarePaginator(array_slice($likes, $likes_offset, $length), count($likes), $length);
-        $likes_paginator->setPath($this->request->path());
-
-        $post = Session()->get('social_user')->user['posts']['data'];
-        $post_page = $this->request->get('page') ?: 1;
-        $post_offset = ($post_page - 1) * $length;
-        $posts_paginator = new LengthAwarePaginator(array_slice($post, $post_offset, $length), count($post), $length);
-        $posts_paginator->setPath($this->request->path());
-
-
-        $sales = \Lava::DataTable();
-
-        $sales->addDateColumn('Date')
-            ->addNumberColumn('Orders');
-
-        foreach (Session()->get('social_user')->user['likes']['data'] as $like) {
-            $date = date('d-m-Y', strtotime($like['created_time']));
-            if(isset($dates[$date]) == false){
-                $dates[$date] = 0;
-            }
-            $dates[$date]++;
-        }
-
-        $biggnestNumber = max(array_values($dates));
-
-        foreach (Session()->get('social_user')->user['likes']['data'] as $like) {
-            $date = date('d-m-Y', strtotime($like['created_time']));            
-            $sales->addRow([$like['created_time'], $dates[$date] ]);
-        }
-
-        \Lava::CalendarChart('Likes', $sales, [
-            'title' => 'Likes',
-            'unusedMonthOutlineColor' => [
-                'stroke'        => '#ECECEC',
-                'strokeOpacity' => 0.75,
-                'strokeWidth'   => 1
-            ],
-            'dayOfWeekLabel' => [
-                'color'    => '#4f5b0d',
-                'fontSize' => 16,
-                'italic'   => true
-            ],
-            'noDataPattern' => [
-                'color' => '#DDD',
-                'backgroundColor' => '#11FFFF'
-            ],
-            'colorAxis' => [
-                'values' => [0, $biggnestNumber],
-                'colors' => ['black', 'green']
-            ]
-        ]);
-        return view('home')
-        ->with('likes_paginator', $likes_paginator)
-        ->with('posts_paginator', $posts_paginator);
+            return $this->socialDrivers[Session()->get('social_user')->user['provider']]->provideData($this->request);
         }else {
             return view('home');
         }

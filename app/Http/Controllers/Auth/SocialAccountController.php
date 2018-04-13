@@ -44,10 +44,7 @@ class SocialAccountController extends Controller
             $authUser = $this->findOrCreateUser($user, $provider);
             Auth::login($authUser, true);   
             $user['provider'] = $provider;
-            Session()->put('social_user', $user);
-
-            $driver->provideData();
-                   
+            Session()->put('social_user', $user);                   
 
             return redirect('/home');
             //return redirect($this->redirectTo);
